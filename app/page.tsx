@@ -5,18 +5,15 @@ import { ArrowRight, Terminal, Zap, ShieldCheck } from "lucide-react";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-      {/* 1. Subtle Background Element - Using theme border/foreground for the dot pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10 opacity-50" />
 
       <main className="flex-1 max-w-5xl mx-auto px-6 pt-32 pb-24 text-center">
-        {/* Badge */}
         <div className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 mb-8">
-          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Engineered for Speed
           </span>
         </div>
 
-        {/* Hero Header */}
         <h1 className="text-5xl md:text-7xl font-medium tracking-tighter text-foreground mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           Mock APIs, <br className="hidden md:block" />
           without the friction.
@@ -27,7 +24,6 @@ export default function Home() {
           conditions without touching a server.
         </p>
 
-        {/* CTAs */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
           <Link href="/mock">
             <Button
@@ -39,7 +35,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Feature Grid */}
         <div className="mt-32 grid grid-cols-1 gap-12 sm:grid-cols-3 text-left border-t border-border/40 pt-16">
           <Feature
             icon={<Terminal className="size-4" />}
@@ -59,7 +54,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="py-12 px-6 border-t border-border/40 flex justify-between items-center max-w-5xl mx-auto w-full">
         <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">
           Prototypes faster with MockAPI

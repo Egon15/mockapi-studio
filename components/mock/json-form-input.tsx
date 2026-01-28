@@ -38,26 +38,22 @@ export default function JsonInputForm({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* Editor Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <FileCode className="size-4 text-muted-foreground/60" />
-          <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Source Definition
           </span>
         </div>
-        <div className="text-[10px] text-muted-foreground/50 font-mono italic">
+        <div className="text-xs text-muted-foreground/50 font-mono italic">
           UTF-8 / JSON
         </div>
       </div>
 
-      {/* The Editor Canvas */}
       <div className="relative group">
-        {/* Border Glow using theme variables */}
         <div className="absolute -inset-0.5 bg-linear-to-b from-border to-transparent rounded-xl opacity-20 blur-[2px] transition-opacity group-focus-within:opacity-100" />
 
         <div className="relative flex flex-col rounded-xl border border-border bg-zinc-950 shadow-2xl overflow-hidden">
-          {/* Editor Chrome - Kept slightly transparent for depth */}
           <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5 bg-white/5">
             <div className="size-2 rounded-full bg-white/10" />
             <div className="size-2 rounded-full bg-white/10" />
@@ -76,7 +72,6 @@ export default function JsonInputForm({
         </div>
       </div>
 
-      {/* Status & Actions */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4">
         <div className="flex-1">
           {error ? (
@@ -96,7 +91,7 @@ export default function JsonInputForm({
 
         <Button
           onClick={handleNext}
-          className="h-10 px-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all group text-[10px] font-medium uppercase tracking-widest"
+          className="h-10 px-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all group text-xs font-medium uppercase tracking-widest"
         >
           Validate & Continue
           <ArrowRight className="ml-2 size-3.5 transition-transform group-hover:translate-x-1" />

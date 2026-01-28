@@ -30,7 +30,6 @@ export default function MockPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-16 px-6 space-y-12 animate-in fade-in duration-700 bg-background text-foreground">
-      {/* 1. Header & Stepper Index */}
       <header className="space-y-6">
         <div className="space-y-1">
           <h1 className="text-3xl font-medium tracking-tighter text-foreground">
@@ -51,7 +50,7 @@ export default function MockPage() {
               <TabsTrigger
                 key={step.value}
                 value={step.value}
-                className="relative bg-transparent border-none p-0 pb-4 text-[11px] uppercase tracking-[0.2em] font-medium data-[state=active]:text-foreground text-muted-foreground rounded-none shadow-none transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-transparent data-[state=active]:after:bg-foreground"
+                className="relative bg-transparent border-none p-0 pb-4 text-xs uppercase tracking-[0.2em] font-medium data-[state=active]:text-foreground text-muted-foreground rounded-none shadow-none transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-transparent data-[state=active]:after:bg-foreground"
               >
                 <span className="mr-2 opacity-50 font-normal">
                   {step.label}
@@ -61,7 +60,6 @@ export default function MockPage() {
             ))}
           </TabsList>
 
-          {/* 2. Content Sections */}
           <div className="mt-12">
             <TabsContent value="input" className="mt-0 outline-none">
               <div className="space-y-8">
@@ -90,15 +88,14 @@ export default function MockPage() {
         </Tabs>
       </header>
 
-      {/* 3. Helper Context (Footer) */}
       <footer className="pt-12 border-t border-border/60 flex items-center gap-4">
         <Badge
           variant="outline"
-          className="rounded-md border-border text-[10px] font-normal tracking-wide bg-background text-foreground"
+          className="rounded-md border-border text-xs font-normal tracking-wide bg-background text-foreground"
         >
           Edge Network: Active
         </Badge>
-        <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+        <span className="text-xs text-muted-foreground uppercase tracking-widest">
           All endpoints auto-expire in 24 hours.
         </span>
       </footer>

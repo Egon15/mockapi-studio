@@ -31,9 +31,7 @@ export default function EndpointSettingsForm({
 }) {
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* Configuration Grid */}
       <div className="grid gap-10">
-        {/* 1. Latency Control */}
         <section className="space-y-6">
           <div className="flex items-center gap-2 text-foreground">
             <Clock className="size-4 text-muted-foreground/50" />
@@ -43,7 +41,7 @@ export default function EndpointSettingsForm({
           </div>
           <div className="space-y-4 rounded-xl border border-border/50 bg-muted/20 p-6">
             <div className="flex justify-between items-center mb-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
+              <label className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
                 Delay Duration
               </label>
               <span className="text-xs font-mono text-foreground bg-background px-2 py-0.5 rounded border border-border shadow-sm">
@@ -57,13 +55,12 @@ export default function EndpointSettingsForm({
               onValueChange={([val]) => onChange({ ...settings, delayMs: val })}
               className="py-4 cursor-pointer"
             />
-            <p className="text-[10px] text-muted-foreground/60 italic">
+            <p className="text-xs text-muted-foreground/60 italic">
               Use this to test your frontend skeleton loaders and timeout logic.
             </p>
           </div>
         </section>
 
-        {/* 2. Response Status */}
         <section className="space-y-6">
           <div className="flex items-center gap-2 text-foreground">
             <Code2 className="size-4 text-muted-foreground/50" />
@@ -73,7 +70,7 @@ export default function EndpointSettingsForm({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-xl border border-border bg-card p-6">
             <div className="space-y-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
+              <label className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
                 Status Code
               </label>
               <Select
@@ -109,7 +106,7 @@ export default function EndpointSettingsForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
+              <label className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
                 Content Type
               </label>
               <Input
@@ -122,15 +119,14 @@ export default function EndpointSettingsForm({
         </section>
       </div>
 
-      {/* CTA Section */}
       <div className="pt-8 flex items-center justify-between border-t border-border/60">
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-widest font-medium">
           <Globe className="size-3" />
           Ready for Edge Deployment
         </div>
         <Button
           onClick={onSubmit}
-          className="h-10 px-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-medium uppercase tracking-widest transition-all hover:gap-3 group"
+          className="h-10 px-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium uppercase tracking-widest transition-all hover:gap-3 group"
         >
           Generate Live Endpoint
           <Zap className="ml-2 size-3 fill-current transition-transform group-hover:scale-110" />

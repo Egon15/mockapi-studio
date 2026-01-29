@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Braces, AlertCircle, ArrowRight, FileCode } from "lucide-react";
 
-const jsonSchema = z.string().refine((val) => {
-  try {
-    JSON.parse(val);
-    return true;
-  } catch {
-    return false;
-  }
-}, "Invalid JSON syntax. Please check for trailing commas or missing quotes.");
+const jsonSchema = z
+  .string()
+  .min(1, "Please enter some JSON data")
+  .refine((val) => {
+    try {
+      JSON.parse(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Invalid JSON syntax. Please check for trailing commas or missing quotes.");
 
 export default function JsonInputForm({
   jsonData,

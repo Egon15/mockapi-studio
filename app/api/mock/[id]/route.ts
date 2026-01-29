@@ -1,31 +1,47 @@
+import clientPromise from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
-
-// mocked DB response for template
-async function fetchData(id: string) {
-  return {
-    jsonData: { msg: "example" },
-    settings: { delayMs: 0, statusCode: 200, headers: {} },
-  };
-}
 
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
-  const record = await fetchData(params.id);
-  if (!record) return new NextResponse("Not Found", { status: 404 });
+  try {
+    const client = await clientPromise;
+    const db = client.db("mockapi-studio");
+    const {id} = await params;
 
-  const { jsonData, settings } = record;
+    const ghost = await db.collection("ghost").findOne({ slug: id });
 
-  if (settings.delayMs) {
-    await new Promise((r) => setTimeout(r, settings.delayMs));
+    if (!ghost) {
+      return new NextResponse(
+        JSON.stringify({ error: "Mock API Endpoint not found" }),
+        {
+          status: 404,
+        },
+      );
+    }
+
+    const delay = ghost.config.delayMs || 0;
+    const statusCode = ghost.config.statusCode || 200;
+    const headers = ghost.config.headers || {};
+
+    if (delay > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    return new NextResponse(JSON.stringify(ghost.data), {
+      status: statusCode,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+    });
+  } catch (error) {
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to fetch mock API data" }),
+      {
+        status: 500,
+      },
+    );
   }
-
-  return new NextResponse(JSON.stringify(jsonData), {
-    status: settings.statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      ...settings.headers,
-    },
-  });
 }

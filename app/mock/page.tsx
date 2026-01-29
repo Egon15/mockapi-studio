@@ -16,16 +16,28 @@ export default function MockPage() {
     headers: {} as Record<string, string>,
   });
   const [generatedUrl, setGeneratedUrl] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const handleGenerate = async () => {
-    const res = await fetch("/api/mock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonData, settings }),
-    });
-    const data = await res.json();
-    setGeneratedUrl(data.url);
-    setActiveTab("result");
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/mock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonData, settings }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setGeneratedUrl(data.url);
+        setActiveTab("result");
+      } else {
+        alert(data.error || "Failed to create mock API");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -50,7 +62,7 @@ export default function MockPage() {
               <TabsTrigger
                 key={step.value}
                 value={step.value}
-                className="relative bg-transparent border-none p-0 pb-4 text-xs uppercase tracking-[0.2em] font-medium data-[state=active]:text-foreground text-muted-foreground rounded-none shadow-none transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-transparent data-[state=active]:after:bg-foreground"
+                className="relative bg-transparent border-none p-0 pb-4 text-xs uppercase tracking-[0.2em] font-medium data-[state=active]:text-foreground text-muted-foreground rounded-none shadow-none transition-all after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-transparent data-[state=active]:after:bg-foreground"
               >
                 <span className="mr-2 opacity-50 font-normal">
                   {step.label}

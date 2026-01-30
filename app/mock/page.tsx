@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import JsonInputForm from "@/components/mock/json-form-input";
 import EndpointSettingsForm from "@/components/mock/endpoint-setting-form";
 import GeneratedEndpointView from "@/components/mock/generated-endoint-view";
+import { id } from "zod/locales";
 
 export default function MockPage() {
   const [activeTab, setActiveTab] = useState("input");
@@ -14,34 +15,59 @@ export default function MockPage() {
     delayMs: 0,
     statusCode: 200,
     headers: {} as Record<string, string>,
+    contentType: "application/json",
   });
   const [generatedUrl, setGeneratedUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [systemStatus, setSystemStatus] = useState({
+    status: "connecting",
+    region: "",
+  });
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        setSystemStatus({ status: data.status, region: data.region });
+      } catch (err) {
+        setSystemStatus({ status: "offline", region: "" });
+      }
+    };
+    checkHealth();
+  }, []);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
+      const isUpdate = !!currentId;
+
       const res = await fetch("/api/mock", {
-        method: "POST",
+        method: isUpdate ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonData, settings }),
+        body: JSON.stringify({ jsonData, settings, id: currentId }),
       });
+
       const data = await res.json();
       if (res.ok) {
-        setGeneratedUrl(data.url);
+        if (!isUpdate) {
+          setCurrentId(data.id);
+          setGeneratedUrl(data.url);
+        }
         setActiveTab("result");
       } else {
         alert(data.error || "Failed to create mock API");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Operation failed: ", error);
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-16 px-6 space-y-12 animate-in fade-in duration-700 bg-background text-foreground">
+    <div className="max-w-4xl mx-auto py-12 px-6 space-y-12 animate-in fade-in duration-700 text-foreground bg-background">
       <header className="space-y-6">
         <div className="space-y-1">
           <h1 className="text-3xl font-medium tracking-tighter text-foreground">
@@ -62,9 +88,13 @@ export default function MockPage() {
               <TabsTrigger
                 key={step.value}
                 value={step.value}
-                className="relative bg-transparent border-none p-0 pb-4 text-xs uppercase tracking-[0.2em] font-medium data-[state=active]:text-foreground text-muted-foreground rounded-none shadow-none transition-all after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-transparent data-[state=active]:after:bg-foreground"
+                className="relative flex items-center px-4 py-2 text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300 rounded-sm
+               text-muted-foreground data-[state=active]:text-foreground 
+               data-[state=active]:bg-muted/40 data-[state=active]:ring-1 data-[state=active]:ring-border/50
+               after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-1/3 after:-translate-x-1/2 after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 
+               data-[state=active]:after:scale-x-100"
               >
-                <span className="mr-2 opacity-50 font-normal">
+                <span className="mr-2 opacity-40 font-normal transition-opacity data-[state=active]:opacity-100">
                   {step.label}
                 </span>
                 {step.title}
@@ -83,11 +113,13 @@ export default function MockPage() {
               </div>
             </TabsContent>
 
+            {/* // TODO : Implement a dropdown to customize the header type */}
             <TabsContent value="settings" className="mt-0 outline-none">
               <EndpointSettingsForm
                 settings={settings}
                 onChange={setSettings}
                 onSubmit={handleGenerate}
+                isGenerating={isGenerating}
               />
             </TabsContent>
 
@@ -103,13 +135,26 @@ export default function MockPage() {
       <footer className="pt-12 border-t border-border/60 flex items-center gap-4">
         <Badge
           variant="outline"
-          className="rounded-md border-border text-xs font-normal tracking-wide bg-background text-foreground"
+          className="rounded-md border-border py-1 px-3 text-xs font-normal tracking-wide bg-background flex items-center gap-2"
         >
-          Edge Network: Active
+          <span className="relative flex size-2">
+            {systemStatus.status === "online" && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            )}
+            <span
+              className={`relative inline-flex size-2 rounded-full ${
+                systemStatus.status === "online"
+                  ? "bg-emerald-500"
+                  : "bg-zinc-600"
+              }`}
+            ></span>
+          </span>
+          <span className="text-muted-foreground uppercase tracking-tight">
+            {systemStatus.status === "online"
+              ? `System Operational  •  ${systemStatus.region}`
+              : "System Offline"}
+          </span>
         </Badge>
-        <span className="text-xs text-muted-foreground uppercase tracking-widest">
-          All endpoints auto-expire in 24 hours.
-        </span>
       </footer>
     </div>
   );

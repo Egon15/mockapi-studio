@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Command } from "lucide-react";
+import { ArrowUpRight, Command } from "lucide-react";
+import { Github } from "lucide-react";
 
 export default function Header() {
   return (
@@ -12,20 +13,23 @@ export default function Header() {
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground transition-transform group-hover:scale-105">
               <Command className="size-3.5" />
             </div>
-            <span className="text-sm font-medium tracking-tighter text-foreground">
+            <span className="text-xl font-bold tracking-tighter text-foreground">
               MockAPI
-              <span className="text-muted-foreground font-normal">.studio</span>
+              <span className="text-muted-foreground font-light ml-0.5">
+                .studio
+              </span>
             </span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <Link
-            href="https://github.com"
+            href="https://github.com/Egon15/mockapi-studio"
             target="_blank"
-            className="text-muted-foreground hover:text-foreground transition-colors text-xs font-medium uppercase tracking-widest"
+            className="text-muted-foreground hover:text-foreground transition-all duration-300 text-xs font-medium uppercase tracking-widest flex items-center group"
           >
-            GitHub
+            Source
+            <ArrowUpRight className="ml-1 size-3 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>
       </div>

@@ -69,7 +69,7 @@ export default function JsonInputForm({
               onChange(e.target.value);
               if (error) setError("");
             }}
-            className="min-h-96 border-none bg-transparent font-mono text-sm leading-relaxed text-zinc-300 placeholder:text-zinc-700 focus-visible:ring-0 p-6 resize-none"
+            className="min-h-96 border-none bg-transparent font-mono text-sm leading-relaxed text-zinc-300 placeholder:text-zinc-600 focus-visible:ring-0 p-6 resize-none"
             placeholder={`{\n  "id": 1,\n  "status": "success",\n  "data": { ... }\n}`}
           />
         </div>

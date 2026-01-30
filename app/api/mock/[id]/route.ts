@@ -8,7 +8,7 @@ export async function GET(
   try {
     const client = await clientPromise;
     const db = client.db("mockapi-studio");
-    const {id} = await params;
+    const { id } = await params;
 
     const ghost = await db.collection("ghost").findOne({ slug: id });
 
@@ -24,6 +24,7 @@ export async function GET(
     const delay = ghost.config.delayMs || 0;
     const statusCode = ghost.config.statusCode || 200;
     const headers = ghost.config.headers || {};
+    const contentType = ghost.config.contentType || "application/json";
 
     if (delay > 0) {
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -32,16 +33,13 @@ export async function GET(
     return new NextResponse(JSON.stringify(ghost.data), {
       status: statusCode,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": contentType,
         ...headers,
       },
     });
   } catch (error) {
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to fetch mock API data" }),
-      {
-        status: 500,
-      },
-    );
+    return new NextResponse(JSON.stringify({ error }), {
+      status: 500,
+    });
   }
 }

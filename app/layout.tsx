@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MockAPI Studio",
-  description: "Generats mock APIs in seconds.",
+  description: "Generate production-ready mock APIs in seconds.",
 };
 
 export default function RootLayout({

@@ -5,7 +5,7 @@ import { ArrowRight, Terminal, Zap, ShieldCheck } from "lucide-react";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-      <div className="absolute inset-0 bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10 opacity-50" />
+      <div className="absolute inset-0 bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-size:32px_32px mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10 opacity-50" />
 
       <main className="flex-1 max-w-5xl mx-auto px-6 pt-32 pb-24 text-center">
         <div className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 mb-8">

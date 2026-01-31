@@ -89,7 +89,7 @@ export default function EndpointSettingsForm({
               </span>
             </div>
             <Slider
-              max={5000}
+              max={10000}
               step={100}
               value={[settings.delayMs]}
               onValueChange={([val]) => onChange({ ...settings, delayMs: val })}

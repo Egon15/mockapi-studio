@@ -13,33 +13,44 @@ export async function GET(
     const ghost = await db.collection("ghost").findOne({ slug: id });
 
     if (!ghost) {
-      return new NextResponse(
-        JSON.stringify({ error: "Mock API Endpoint not found" }),
-        {
-          status: 404,
-        },
+      return NextResponse.json(
+        { error: "Mock API Endpoint not found" },
+        { status: 404 },
       );
     }
 
-    const delay = ghost.config.delayMs || 0;
-    const statusCode = ghost.config.statusCode || 200;
-    const headers = ghost.config.headers || {};
-    const contentType = ghost.config.contentType || "application/json";
+    const {
+      delayMs = 0,
+      statusCode = 200,
+      headers = {},
+      contentType = "application/json",
+    } = ghost.config || {};
 
-    if (delay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
+    //  Handling the custom delay as requested by the user
+    if (delayMs > 0) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.min(delayMs, 10000)),
+      );
     }
 
-    return new NextResponse(JSON.stringify(ghost.data), {
+    //  If it's JSON, stringify it. If it's a raw string (for text/xml/etc), send as is.
+    const body = contentType.includes("json")
+      ? JSON.stringify(ghost.data)
+      : ghost.data;
+
+    return new NextResponse(body, {
       status: statusCode,
       headers: {
         "Content-Type": contentType,
+        "Access-Control-Allow-Origin": "*", // CORS Support: Essential for Mock APIs to be callable from other sites
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
         ...headers,
       },
     });
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

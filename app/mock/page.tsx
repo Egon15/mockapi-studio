@@ -6,11 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import JsonInputForm from "@/components/mock/json-form-input";
 import EndpointSettingsForm from "@/components/mock/endpoint-setting-form";
 import GeneratedEndpointView from "@/components/mock/generated-endoint-view";
-import { id } from "zod/locales";
 
 export default function MockPage() {
   const [activeTab, setActiveTab] = useState("input");
-  const [jsonData, setJsonData] = useState<string>("");
+  const [payloadData, setPayloadData] = useState<string>("");
   const [settings, setSettings] = useState({
     delayMs: 0,
     statusCode: 200,
@@ -24,6 +23,10 @@ export default function MockPage() {
     status: "connecting",
     region: "",
   });
+
+  const handleTypeChange = (newType: string) => {
+    setSettings((prev) => ({ ...prev, contentType: newType }));
+  };
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -46,7 +49,7 @@ export default function MockPage() {
       const res = await fetch("/api/mock", {
         method: isUpdate ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonData, settings, id: currentId }),
+        body: JSON.stringify({ payloadData, settings, id: currentId }),
       });
 
       const data = await res.json();
@@ -104,16 +107,15 @@ export default function MockPage() {
 
           <div className="mt-12">
             <TabsContent value="input" className="mt-0 outline-none">
-              <div className="space-y-8">
-                <JsonInputForm
-                  jsonData={jsonData}
-                  onChange={setJsonData}
-                  onNext={() => setActiveTab("settings")}
-                />
-              </div>
+              <JsonInputForm
+                payloadData={payloadData}
+                onChange={setPayloadData}
+                contentType={settings.contentType} // Pass current type
+                onTypeChange={handleTypeChange} // Pass updater
+                onNext={() => setActiveTab("settings")}
+              />
             </TabsContent>
 
-            {/* // TODO : Implement a dropdown to customize the header type */}
             <TabsContent value="settings" className="mt-0 outline-none">
               <EndpointSettingsForm
                 settings={settings}

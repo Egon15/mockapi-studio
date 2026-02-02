@@ -1,13 +1,17 @@
 import clientPromise from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 
+// Mocks change frequently, and we need fresh data every time.
+export const dynamic = "force-dynamic";
+
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const client = await clientPromise;
     const db = client.db("mockapi-studio");
+
     const { id } = await params;
 
     const ghost = await db.collection("ghost").findOne({ slug: id });
@@ -44,13 +48,26 @@ export async function GET(
         "Content-Type": contentType,
         "Access-Control-Allow-Origin": "*", // CORS Support: Essential for Mock APIs to be callable from other sites
         "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         ...headers,
       },
     });
   } catch (error) {
+    console.error("Mock API Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
 }

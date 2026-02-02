@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import JsonInputForm from "@/components/mock/json-form-input";
+import PayloadInputForm from "@/components/mock/payload-input-form";
 import EndpointSettingsForm from "@/components/mock/endpoint-setting-form";
-import GeneratedEndpointView from "@/components/mock/generated-endoint-view";
+import { DeploymentModal } from "@/components/mock/deployment-modal";
 
 export default function MockPage() {
   const [activeTab, setActiveTab] = useState("input");
+
+  // Core Data State
   const [payloadData, setPayloadData] = useState<string>("");
   const [settings, setSettings] = useState({
     delayMs: 0,
@@ -16,7 +18,8 @@ export default function MockPage() {
     headers: {} as Record<string, string>,
     contentType: "application/json",
   });
-  const [generatedUrl, setGeneratedUrl] = useState<string>("");
+
+  // System State
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [systemStatus, setSystemStatus] = useState({
@@ -24,10 +27,15 @@ export default function MockPage() {
     region: "",
   });
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deployedUrl, setDeployedUrl] = useState("");
+
   const handleTypeChange = (newType: string) => {
     setSettings((prev) => ({ ...prev, contentType: newType }));
   };
 
+  // Health Check
   useEffect(() => {
     const checkHealth = async () => {
       try {
@@ -41,7 +49,8 @@ export default function MockPage() {
     checkHealth();
   }, []);
 
-  const handleGenerate = async () => {
+  // Deploy Function
+  const handleDeploy = async () => {
     setIsGenerating(true);
     try {
       const isUpdate = !!currentId;
@@ -53,13 +62,19 @@ export default function MockPage() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
+        // Update local state so subsequent clicks become updates
         if (!isUpdate) {
           setCurrentId(data.id);
-          setGeneratedUrl(data.url);
         }
-        setActiveTab("result");
+
+        // Construct URL and Open Modal
+        const fullUrl = `${window.location.origin}/m/${data.id}`;
+        setDeployedUrl(fullUrl);
+        setIsModalOpen(true);
       } else {
+        // TODO : Replace this with a toast notification
         alert(data.error || "Failed to create mock API");
       }
     } catch (error) {
@@ -86,7 +101,6 @@ export default function MockPage() {
             {[
               { value: "input", label: "01", title: "Payload" },
               { value: "settings", label: "02", title: "Behavior" },
-              { value: "result", label: "03", title: "Deployment" },
             ].map((step) => (
               <TabsTrigger
                 key={step.value}
@@ -107,11 +121,11 @@ export default function MockPage() {
 
           <div className="mt-12">
             <TabsContent value="input" className="mt-0 outline-none">
-              <JsonInputForm
+              <PayloadInputForm
                 payloadData={payloadData}
                 onChange={setPayloadData}
-                contentType={settings.contentType} // Pass current type
-                onTypeChange={handleTypeChange} // Pass updater
+                contentType={settings.contentType}
+                onTypeChange={handleTypeChange}
                 onNext={() => setActiveTab("settings")}
               />
             </TabsContent>
@@ -119,20 +133,21 @@ export default function MockPage() {
             <TabsContent value="settings" className="mt-0 outline-none">
               <EndpointSettingsForm
                 settings={settings}
+                payloadData={payloadData}
                 onChange={setSettings}
-                onSubmit={handleGenerate}
+                onSubmit={handleDeploy}
                 isGenerating={isGenerating}
               />
-            </TabsContent>
-
-            <TabsContent value="result" className="mt-0 outline-none">
-              <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-12">
-                <GeneratedEndpointView url={generatedUrl} />
-              </div>
             </TabsContent>
           </div>
         </Tabs>
       </header>
+
+      <DeploymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        endpointUrl={deployedUrl}
+      />
 
       <footer className="pt-12 border-t border-border/60 flex items-center gap-4">
         <Badge

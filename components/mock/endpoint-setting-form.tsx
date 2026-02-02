@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -11,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Zap, Clock, Code2, Globe } from "lucide-react";
+import { Zap, Clock, Code2, Globe, AlertCircle } from "lucide-react";
 
 export const CONTENT_TYPES = [
   {
@@ -48,8 +47,38 @@ export const CONTENT_TYPES = [
   },
 ] as const;
 
+const isMismatched = (type: string, data: string) => {
+  if (type.includes("json")) {
+    try {
+      JSON.parse(data);
+      return false;
+    } catch {
+      return true;
+    }
+  }
+  // You can add XML regex checks here if you want to be extra fancy
+  return false;
+};
+const detectDataType = (data: string) => {
+  const trimmed = data.trim();
+  if (!trimmed) return "empty";
+
+  // JSON Check
+  try {
+    JSON.parse(trimmed);
+    return "json";
+  } catch {}
+
+  // XML Check (Basic Tag Match)
+  const xmlPattern = /^<(\?xml|[\w\W]+)>[\w\W]*<\/[\w\W]+>$/i;
+  if (xmlPattern.test(trimmed)) return "xml";
+
+  return "text";
+};
+
 export default function EndpointSettingsForm({
   settings,
+  payloadData,
   onChange,
   onSubmit,
   isGenerating,
@@ -60,6 +89,7 @@ export default function EndpointSettingsForm({
     headers: Record<string, string>;
     contentType: string;
   };
+  payloadData: string;
   onChange: (v: {
     delayMs: number;
     statusCode: number;
@@ -69,6 +99,23 @@ export default function EndpointSettingsForm({
   onSubmit: () => void;
   isGenerating: boolean;
 }) {
+  const dataType = detectDataType(payloadData);
+
+  const isJsonMismatched =
+    settings.contentType.includes("json") && dataType !== "json";
+  const isXmlMismatched =
+    settings.contentType.includes("xml") && dataType !== "xml";
+
+  // Critical: Serving structured data as plain text is okay,
+  // but serving random text as JSON/XML will break client parsers.
+  const isCriticalError =
+    (settings.contentType.includes("json") && dataType === "text") ||
+    (settings.contentType.includes("xml") && dataType === "json");
+
+  const isSynced =
+    (settings.contentType.includes("json") && dataType === "json") ||
+    (settings.contentType.includes("xml") && dataType === "xml") ||
+    (settings.contentType === "text/plain" && dataType === "text");
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="grid gap-10">
@@ -146,48 +193,113 @@ export default function EndpointSettingsForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                Response Content-Type
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                  Response Content-Type
+                </label>
+
+                {isSynced ? (
+                  <span className="text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    Synced with Source
+                  </span>
+                ) : isCriticalError ? (
+                  <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full border border-destructive/20 animate-pulse">
+                    Parsing Risk
+                  </span>
+                ) : (
+                  <span className="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20">
+                    Manual Override
+                  </span>
+                )}
+              </div>
+
               <Select
                 value={settings.contentType}
                 onValueChange={(val) =>
                   onChange({ ...settings, contentType: val })
                 }
-                defaultValue="application/json"
               >
-                <SelectTrigger className="w-full bg-zinc-950 border-border">
+                <SelectTrigger
+                  className={`w-full bg-zinc-950 transition-all ${
+                    isCriticalError
+                      ? "border-destructive ring-1 ring-destructive/20"
+                      : "border-border"
+                  }`}
+                >
                   <SelectValue placeholder="Select content type" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-950 border-border">
                   {CONTENT_TYPES.map((group) => (
                     <SelectGroup key={group.label}>
-                      <SelectLabel className="text-zinc-500">
+                      <SelectLabel className="text-zinc-500 text-[10px] uppercase tracking-tighter">
                         {group.label}
                       </SelectLabel>
-                      {group.options.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
+                      {group.options.map((opt) => {
+                        // Logic: Block XML if we detected pure JSON to prevent crash
+                        const blockXml =
+                          opt.value.includes("xml") && dataType === "json";
+                        // Logic: Block JSON if it's clearly not JSON
+                        const blockJson =
+                          opt.value.includes("json") && dataType === "text";
+
+                        return (
+                          <SelectItem
+                            key={opt.value}
+                            value={opt.value}
+                            disabled={blockXml || blockJson}
+                            className="text-xs"
+                          >
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span>{opt.label}</span>
+                              {(blockXml || blockJson) && (
+                                <span className="text-[9px] opacity-50 italic">
+                                  Incompatible
+                                </span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectGroup>
                   ))}
                 </SelectContent>
               </Select>
+
+              {/* Dynamic Error Messages */}
+              {isCriticalError && (
+                <div className="flex items-center gap-1.5 mt-2 text-destructive animate-in slide-in-from-top-1">
+                  <AlertCircle className="size-3" />
+                  <p className="text-[10px] font-medium">
+                    The selected header will cause client-side parsing errors
+                    with this payload.
+                  </p>
+                </div>
+              )}
+
+              {!isSynced && !isCriticalError && (
+                <div className="flex items-center gap-1.5 mt-2 text-amber-500 italic animate-in slide-in-from-top-1">
+                  <AlertCircle className="size-3" />
+                  <p className="text-[10px]">
+                    Note: Payload format differs from the standard{" "}
+                    {settings.contentType.split("/")[1]} structure.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>
       </div>
-      {/* // TODO : See if you can show the "Ready" message based on some verification or validation of filled forms etc */}
       <div className="pt-8 flex items-center justify-between border-t border-border/60">
         <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-widest font-medium">
-          <Globe className="size-3" />
-          Ready for Edge Deployment
+          <Globe
+            className={`size-3 ${isCriticalError ? "text-destructive" : "text-emerald-500"}`}
+          />
+          {isCriticalError ? "Validation Failed" : "Ready for Edge Deployment"}
         </div>
         <Button
           onClick={onSubmit}
           className="h-10 px-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium uppercase tracking-widest transition-all hover:gap-3 group"
-          disabled={isGenerating}
+          disabled={isGenerating || isCriticalError} // Prevent deployment if broken
         >
           {isGenerating ? "Generating..." : "Generate Live Endpoint"}
           <Zap className="ml-2 size-3 fill-current transition-transform group-hover:scale-110" />

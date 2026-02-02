@@ -4,17 +4,17 @@ import clientPromise from "@/lib/dbConnect";
 
 export async function POST(req: Request) {
   try {
-    const { jsonData, settings } = await req.json();
+    const { payloadData, settings } = await req.json();
     const client = await clientPromise;
     const db = client.db("mockapi-studio");
 
-    // Only parse if the content type is JSON
     let finalData;
+
     if (settings.contentType.includes("json")) {
       finalData =
-        typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
+        typeof payloadData === "string" ? JSON.parse(payloadData) : payloadData;
     } else {
-      finalData = jsonData; // Store as raw string for Text/XML/CSV
+      finalData = payloadData; // Store as raw string for Text/XML/CSV
     }
 
     const id = nanoid(8);
@@ -23,9 +23,11 @@ export async function POST(req: Request) {
       data: finalData,
       config: settings,
       createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const url = `${req.headers.get("origin")}/api/mock/${id}`;
+
     return NextResponse.json({ id, url });
   } catch (error) {
     return NextResponse.json(
@@ -37,7 +39,7 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const { id, jsonData, settings } = await req.json();
+    const { id, payloadData, settings } = await req.json();
     const client = await clientPromise;
     const db = client.db("mockapi-studio");
 
@@ -47,9 +49,9 @@ export async function PATCH(req: Request) {
     let finalData;
     if (settings.contentType.includes("json")) {
       finalData =
-        typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
+        typeof payloadData === "string" ? JSON.parse(payloadData) : payloadData;
     } else {
-      finalData = jsonData;
+      finalData = payloadData;
     }
 
     const result = await db.collection("ghost").updateOne(
@@ -64,10 +66,18 @@ export async function PATCH(req: Request) {
     );
 
     if (result.matchedCount === 0)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Endpoint not found" },
+        { status: 404 },
+      );
 
-    return NextResponse.json({ message: "Updated successfully" });
+    return NextResponse.json({
+      message: "Updated successfully",
+      id,
+      url: `${req.headers.get("origin")}/api/mock/${id}`,
+    });
   } catch (error) {
+    console.error("PATCH Error:", error);
     return NextResponse.json({ error: "Invalid data format" }, { status: 400 });
   }
 }

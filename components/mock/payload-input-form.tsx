@@ -125,6 +125,7 @@ export default function PayloadInputForm({
           </div>
 
           <Textarea
+            id="payload-editor"
             value={payloadData}
             onChange={(e) => {
               onChange(e.target.value);

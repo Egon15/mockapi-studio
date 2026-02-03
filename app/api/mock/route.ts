@@ -26,7 +26,9 @@ export async function POST(req: Request) {
       updatedAt: new Date(),
     });
 
-    const url = `${req.headers.get("origin")}/api/mock/${id}`;
+    const host = req.headers.get("host");
+    const protocol = req.headers.get("x-forwarded-proto") || "https";
+    const url = `${protocol}://${host}/api/mock/${id}`;
 
     return NextResponse.json({ id, url });
   } catch (error) {

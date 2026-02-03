@@ -13,8 +13,10 @@ export async function GET(
     const db = client.db("mockapi-studio");
 
     const { id } = await params;
+    console.log("Fetching Mock ID: ", id);
 
     const ghost = await db.collection("ghost").findOne({ slug: id });
+    console.log("Database Result: ", ghost);
 
     if (!ghost) {
       return NextResponse.json(

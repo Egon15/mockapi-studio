@@ -70,7 +70,7 @@ export default function MockPage() {
         }
 
         // Construct URL and Open Modal
-        const fullUrl = `${window.location.origin}/m/${data.id}`;
+        const fullUrl = `${window.location.origin}/api/mock/${data.id}`;
         setDeployedUrl(fullUrl);
         setIsModalOpen(true);
       } else {

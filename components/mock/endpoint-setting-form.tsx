@@ -265,7 +265,6 @@ export default function EndpointSettingsForm({
                 </SelectContent>
               </Select>
 
-              {/* Dynamic Error Messages */}
               {isCriticalError && (
                 <div className="flex items-center gap-1.5 mt-2 text-destructive animate-in slide-in-from-top-1">
                   <AlertCircle className="size-3" />

@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Check, Copy, ExternalLink, PartyPopper } from "lucide-react";
+import { Check, Copy, ExternalLink, PartyPopper, Clock } from "lucide-react";
 import { useState } from "react";
 
 export function DeploymentModal({
@@ -19,6 +19,17 @@ export function DeploymentModal({
   endpointUrl: string;
 }) {
   const [copied, setCopied] = useState(false);
+
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + 3);
+
+  const formattedExpiry = expiryDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(endpointUrl);
@@ -80,6 +91,13 @@ export function DeploymentModal({
               Done
             </Button>
           </div>
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-2 px-1 text-xs text-muted-foreground italic border-t border-border/20 pt-4">
+          <Clock className="size-4" />
+          <span>
+            This endpoint and its data will automatically expire on{" "}
+            {formattedExpiry}
+          </span>
         </div>
       </DialogContent>
     </Dialog>

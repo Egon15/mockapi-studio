@@ -39,7 +39,7 @@ export function DeploymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-border shadow-2xl">
+      <DialogContent className="bg-zinc-950 border-border shadow-2xl">
         <DialogHeader className="flex flex-col items-center justify-center space-y-4">
           <div className="size-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
             <PartyPopper className="size-6 text-emerald-500" />

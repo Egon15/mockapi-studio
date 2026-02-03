@@ -1,6 +1,7 @@
 {
   "name": "mockapi-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "description": "A lightweight studio for generating and hosting mock API endpoints.",
   "private": true,
   "scripts": {
     "dev": "next dev",

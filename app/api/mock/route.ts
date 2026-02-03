@@ -8,13 +8,20 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db("mockapi-studio");
 
-    let finalData;
+    let finalData = payloadData;
 
     if (settings.contentType.includes("json")) {
-      finalData =
-        typeof payloadData === "string" ? JSON.parse(payloadData) : payloadData;
-    } else {
-      finalData = payloadData; // Store as raw string for Text/XML/CSV
+      try {
+        finalData =
+          payloadData && typeof payloadData === "string"
+            ? JSON.parse(payloadData)
+            : payloadData;
+      } catch (e) {
+        return NextResponse.json(
+          { error: "Invalid JSON format in payload" },
+          { status: 400 },
+        );
+      }
     }
 
     const id = nanoid(8);
@@ -32,6 +39,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ id, url });
   } catch (error) {
+    console.log("POST ROUTE ERROR: ", error);
     return NextResponse.json(
       { error: "Invalid data format for selected Content-Type" },
       { status: 400 },
